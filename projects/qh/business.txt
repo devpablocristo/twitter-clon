@@ -1,0 +1,53 @@
+## Suposiciones y Consideraciones de Negocio:
+
+1. Usuarios:
+   - No se implementa un módulo de autenticación ni manejo de sesiones.
+   - Se asume que el identificador del usuario es válido y se envía en cada request (por header, query o body).
+
+2. Tweets:
+   - Los usuarios pueden publicar mensajes cortos de hasta 280 caracteres.
+   - Se utiliza Cassandra para almacenar los tweets y mantener una vista denormalizada (timeline_by_user) que permita consultas rápidas, aprovechando la escalabilidad horizontal de Cassandra para soportar millones de usuarios.
+
+3. Follow:
+   - Los usuarios pueden seguir a otros usuarios.
+   - La relación de seguimiento se almacena en una base de datos SQL (PostgreSQL) a través de GORM, para facilitar operaciones de unión y validación.
+
+4. Timeline:
+   - El timeline se construye a partir de los tweets de los usuarios seguidos.
+   - Se utiliza Redis para cachear el timeline, mejorando la latencia en las consultas y reduciendo la carga en Cassandra.
+
+5. Mensajería:
+   - Se utiliza RabbitMQ como broker de mensajes para la publicación de eventos de tweets.
+   - La publicación asíncrona permite desacoplar la creación del tweet de su difusión a los timelines de los seguidores (fan‑out).
+
+6. Arquitectura:
+   - Se ha adoptado una **arquitectura hexagonal** (Clean Architecture) que separa claramente las capas de dominio, casos de uso, puertos y adaptadores.
+   - La inyección de dependencias se realiza utilizando Google Wire, lo que facilita el testing y la escalabilidad.
+
+7. Contenerización y Despliegue:
+   - Todos los servicios (Cassandra, PostgreSQL, Redis, RabbitMQ) se ejecutan en contenedores Docker.
+   - Se utiliza Docker Compose para levantar el entorno de desarrollo y pruebas.
+   - La solución está preparada para ser desplegada en entornos orquestados (por ejemplo, Kubernetes).
+
+8. Testing:
+   - Se incluyen pruebas unitarias, de integración y funcionales para los casos de uso principales.
+   - Se utilizan herramientas como Testify y GoMock para validar la lógica de negocio y la integración de los componentes.
+
+9. Otras Consideraciones:
+   - Se pueden sumar nuevas suposiciones o modificaciones en función de la evolución de los requerimientos.
+   - Este documento se mantendrá actualizado para reflejar cambios futuros en el diseño o en la infraestructura.
+
+### Cómo Utilizar la Documentación
+
+1. **Para levantar el proyecto:**
+   - Sigue las instrucciones del `README.md` para configurar el entorno de desarrollo y de prueba.
+   - Asegúrate de tener definidas las variables de entorno necesarias, tal como se indica en el README y en `business.txt`.
+
+2. **Para ejecutar los tests:**
+   - Ejecuta los tests de integración desde el directorio del proyecto (o utiliza Make si está configurado):
+     ```bash
+     go test -v ./projects/qh/internal/tweet/integration-tests
+     ```
+3. **Para consultar la lógica y el diseño:**
+   - Revisa las secciones de “Diseño Arquitectónico” y “Suposiciones y Consideraciones de Negocio” en el `README.md` para entender cómo se separa la aplicación en capas y cómo se han elegido las tecnologías.
+   - El archivo `business.txt` complementa esta información con consideraciones de negocio y suposiciones clave.
