@@ -5,63 +5,60 @@ Este proyecto fue desarrollado como parte del proceso de selección para Ualá.
 
 ---
 
-## Instalación y Ejecución
+## 📌 Instalación y Ejecución
 
-### Entorno de Desarrollo
+### 🔹 Entorno de Desarrollo
 
-1. Clona el repositorio y accede al directorio del proyecto:
+1. **Clona el repositorio y accede al directorio del proyecto:**
    ```bash
    git clone https://github.com/tu_usuario/twitter-clon.git
    cd twitter-clon/projects/qh
    ```
 
-2. Levanta las dependencias (Cassandra, PostgreSQL, Redis, RabbitMQ, etc.) utilizando Docker Compose:
+2. **Levanta las dependencias (Cassandra, PostgreSQL, Redis, RabbitMQ, etc.) con Docker Compose:**
    ```bash
    docker-compose up -d
    ```
 
-3. Construye la aplicación para el entorno de desarrollo:
+3. **Construye la aplicación para el entorno de desarrollo:**
    ```bash
    make qh-dev-build
    ```
 
-4. Para depurar en Visual Studio Code:
+4. **Depuración en Visual Studio Code:**
    - Abre el proyecto en VS Code.
-   - Levantar el container (visual code - attach visual studio code-) 
-   - Correr el debugger (F5).
+   - Adjunta el contenedor (Attach Visual Studio Code).
+   - Ejecuta el debugger (`F5`).
 
-### Entorno de Prueba / Staging
+### 🔹 Entorno de Prueba / Staging
 
-1. Asegúrate de tener levantados los servicios de Docker Compose (como en el entorno de desarrollo).
+1. **Asegúrate de que los servicios de Docker Compose estén en ejecución.**
 
-2. Construye la aplicación para el entorno de prueba:
+2. **Construye la aplicación para el entorno de prueba:**
    ```bash
    make qh-stg-build
    ```
 
-En ambos entornos, la aplicación se iniciará en el puerto configurado (por defecto, 8080).
-
-Se incluye el archvo de variables de entorno .env por simplicidad.
+📍 **Por defecto, la aplicación se ejecuta en el puerto 8080.**  
+📍 **Se incluye el archivo `.env` para simplificar la configuración de variables de entorno.**
 
 ---
 
-## Estructura del Proyecto
-
-La estructura del proyecto es la siguiente (se muestran las carpetas principales):
+## 📂 Estructura del Proyecto
 
 ```
-pkg                         # liberias de infrastrutura
+pkg                         # Librerías de infraestructura
 
 Proyecto
 ├── cmd
-│   └── api
+│   └── api
 │       └── main.go         # Punto de entrada de la aplicación
 ├── internal
-│   ├── authe               # Lógica de Autenticación
-│   ├── config              # Configuración general
-│   ├── person              # Lógica de Person (PostgreSQL)
-│   ├── tweet               # Lógica de Tweets (Cassandra, Redis, RabbitMQ)
-│   └── user                # Lógica de Users (GORM)
+│   ├── auth               # Lógica de Autenticación
+│   ├── config             # Configuración general
+│   ├── person             # Lógica de Personas (PostgreSQL)
+│   ├── tweet              # Lógica de Tweets (Cassandra, Redis, RabbitMQ)
+│   └── user               # Lógica de Usuarios (GORM)
 ├── integration-tests       # Tests de integración para tweets
 ├── mocks                   # Mocks generados con GoMock
 └── wire                    # Inyección de dependencias con Wire
@@ -69,18 +66,102 @@ Proyecto
 
 ---
 
-## Consideraciones y Asunciones de Negocio
+## ⚡ Consideraciones y Asunciones de Negocio
 
-- **Autenticación:** No se implementa un sistema de *sign in* o manejo de sesiones, ya que se asume que todos los usuarios son válidos. El identificador del usuario se envía como parámetro.
-- **Escalabilidad:** La solución está pensada para escalar a millones de usuarios mediante el uso de bases de datos distribuidas (Cassandra), cache distribuido (Redis) y mensajería asíncrona (RabbitMQ).
-- **Optimización para Lecturas:** Se prioriza la optimización en operaciones de lectura, utilizando técnicas de cache y una estructura de datos denormalizada para el timeline.
-- **Testing:** Se incluyen tests unitarios y de integración para cubrir los casos de uso principales.
-- **Infraestructura:** La aplicación se despliega en contenedores utilizando Docker Compose, lo que facilita la replicación del entorno de producción en desarrollo y pruebas.
+✅ **Autenticación:**  
+No se implementa un sistema de *sign in* o manejo de sesiones. Se asume que todos los usuarios son válidos y se identifican mediante un parámetro en las solicitudes.
+
+✅ **Escalabilidad:**  
+La solución está diseñada para soportar millones de usuarios utilizando bases de datos distribuidas (*Cassandra*), caché distribuido (*Redis*) y mensajería asíncrona (*RabbitMQ*).
+
+✅ **Optimización para Lecturas:**  
+Se prioriza la eficiencia en consultas utilizando estrategias de cache y estructuras de datos denormalizadas para el timeline.
+
+✅ **Testing:**  
+Se incluyen pruebas unitarias y de integración para validar los casos de uso principales.
+
+✅ **Infraestructura:**  
+Se despliega en contenedores mediante *Docker Compose* para facilitar la replicación en distintos entornos.
 
 ---
 
-## Notas Adicionales
+## 🚀 Pruebas con `curl`
 
-- **Docker Compose:** El archivo `docker-compose.yml` incluye la configuración para levantar servicios como Cassandra, PostgreSQL, Redis y RabbitMQ.
-- **Wire:** Se utiliza para la inyección de dependencias, lo que facilita la escalabilidad y el mantenimiento del código.
-- **Make:** Se utilizan targets en el Makefile para simplificar la construcción de la aplicación en diferentes entornos.
+### 🏷️ Crear una Persona
+```bash
+curl --location 'localhost:8080/api/v1/person/public' \
+--header 'Content-Type: application/json' \
+--data '{
+    "first_name": "Homero",
+    "last_name": "Simpson",
+    "age": 40,
+    "gender": "male",
+    "national_id": 1234567890,
+    "phone": "+11234567890",
+    "interests": ["beer", "doughnuts", "TV"],
+    "hobbies": ["fishing", "sleeping"]
+}'
+```
+
+### 🏷️ Crear un Usuario
+```bash
+curl --location 'localhost:8080/api/v1/users/public' \
+--header 'Content-Type: application/json' \
+--data '{
+  "user_type": "regular",
+  "email_validated": false,
+  "person_id": "3d1130b1-2dff-4e8c-bbbc-e56e5c960460",
+  "credentials": {
+    "email": "homero.simpson@example.com",
+    "password": "doh123"
+  },
+  "roles": [
+    {
+      "name": "user",
+      "permissions": [
+        {
+          "name": "tweet:read",
+          "description": "Permite leer tweets"
+        },
+        {
+          "name": "tweet:write",
+          "description": "Permite escribir tweets"
+        }
+      ]
+    }
+  ]
+}'
+```
+
+### 🏷️ Seguir a un Usuario
+```bash
+curl --location 'localhost:8080/api/v1/users/public/follow' \
+--header 'Content-Type: application/json' \
+--data '{
+    "follower_id": "fb312abc-d3ee-4450-8c3c-ac4ff1f3ed86",
+    "followee_id": "8aa26deb-ab89-42df-a757-59633b35731b"
+}'
+```
+
+### 🏷️ Publicar un Tweet
+```bash
+curl --location 'localhost:8080/api/v1/tweets/public' \
+--header 'Content-Type: application/json' \
+--data '{
+    "user_id": "8aa26deb-ab89-42df-a757-59633b35731b",
+    "content": "¡Me gustan las rosquillas! 🍩"
+}'
+```
+
+### 🏷️ Consultar el Timeline de un Usuario
+```bash
+curl --location 'localhost:8080/api/v1/tweets/public/fb312abc-d3ee-4450-8c3c-ac4ff1f3ed86/timeline'
+```
+
+---
+
+## 📌 Notas Adicionales
+
+- 🐳 **Docker Compose:** El archivo `docker-compose.yml` define la configuración de Cassandra, PostgreSQL, Redis y RabbitMQ.
+- 🔗 **Wire:** Se utiliza para la inyección de dependencias, facilitando la escalabilidad y el mantenimiento del código.
+- ⚙️ **Makefile:** Se incluyen *targets* en el `Makefile` para simplificar la construcción y ejecución de la aplicación en distintos entornos.
