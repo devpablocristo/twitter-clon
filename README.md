@@ -94,7 +94,15 @@ Se despliega en contenedores mediante *Docker Compose* para facilitar la replica
 
 ## 🚀 Pruebas con `curl`
 
+Para las pruebas se usaron los personajes de los simpsons.
+
 ### 🏷️ Crear una Persona
+
+Para datos de prueba se usaron a los personajes de Los Simpsons.
+Se recomienda usar a Marge para realizar pruebas para el timeline, ya que Marge, sigue a todos los personajes. 
+
+Ejemplo: 
+
 ```bash
 curl --location 'localhost:8080/api/v1/person/public' \
 --header 'Content-Type: application/json' \
@@ -117,7 +125,7 @@ curl --location 'localhost:8080/api/v1/users/public' \
 --data '{
   "user_type": "regular",
   "email_validated": false,
-  "person_id": "3d1130b1-2dff-4e8c-bbbc-e56e5c960460",
+  "person_id": ----- person id Homero ------,
   "credentials": {
     "email": "homero.simpson@example.com",
     "password": "doh123"
@@ -145,8 +153,8 @@ curl --location 'localhost:8080/api/v1/users/public' \
 curl --location 'localhost:8080/api/v1/users/public/follow' \
 --header 'Content-Type: application/json' \
 --data '{
-    "follower_id": "fb312abc-d3ee-4450-8c3c-ac4ff1f3ed86",
-    "followee_id": "8aa26deb-ab89-42df-a757-59633b35731b"
+    "follower_id": "----- user id Marge ------",
+    "followee_id": "----- user id Homero ------"
 }'
 ```
 
@@ -155,7 +163,7 @@ curl --location 'localhost:8080/api/v1/users/public/follow' \
 curl --location 'localhost:8080/api/v1/tweets/public' \
 --header 'Content-Type: application/json' \
 --data '{
-    "user_id": "8aa26deb-ab89-42df-a757-59633b35731b",
+    "user_id": "----- user id Homero ------",
     "content": "¡Me gustan las rosquillas! 🍩"
 }'
 ```
