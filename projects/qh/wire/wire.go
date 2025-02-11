@@ -18,12 +18,8 @@ import (
 	mdw "github.com/devpablocristo/monorepo/pkg/rest/middlewares/gin"
 	gin "github.com/devpablocristo/monorepo/pkg/rest/servers/gin"
 
-	assessment "github.com/devpablocristo/monorepo/projects/qh/internal/assessment"
 	authe "github.com/devpablocristo/monorepo/projects/qh/internal/authe"
-	candidate "github.com/devpablocristo/monorepo/projects/qh/internal/candidate"
 	config "github.com/devpablocristo/monorepo/projects/qh/internal/config"
-	event "github.com/devpablocristo/monorepo/projects/qh/internal/event"
-	group "github.com/devpablocristo/monorepo/projects/qh/internal/group"
 	notification "github.com/devpablocristo/monorepo/projects/qh/internal/notification"
 	person "github.com/devpablocristo/monorepo/projects/qh/internal/person"
 	tweet "github.com/devpablocristo/monorepo/projects/qh/internal/tweet"
@@ -48,11 +44,7 @@ type Dependencies struct {
 	Middlewares *mdw.Middlewares
 
 	PersonHandler       *person.Handler
-	GroupHandler        *group.Handler
-	EventHandler        *event.Handler
 	UserHandler         *user.Handler
-	AssessmentHandler   *assessment.Handler
-	CandidateHandler    *candidate.Handler
 	AutheHandler        *authe.Handler
 	NotificationHandler *notification.Handler
 	TweetHandler        *tweet.Handler
@@ -86,30 +78,10 @@ func Initialize() (*Dependencies, error) {
 		ProvidePersonUseCases,
 		ProvidePersonHandler,
 
-		// Group
-		ProvideGroupRepository,
-		ProvideGroupUseCases,
-		ProvideGroupHandler,
-
-		// Event
-		ProvideEventRepository,
-		ProvideEventUseCases,
-		ProvideEventHandler,
-
 		// User
 		ProvideUserRepository,
 		ProvideUserUseCases,
 		ProvideUserHandler,
-
-		// Assessment
-		ProvideAssessmentRepository,
-		ProvideAssessmentUseCases,
-		ProvideAssessmentHandler,
-
-		// Candidate
-		ProvideCandidateRepository,
-		ProvideCandidateUseCases,
-		ProvideCandidateHandler,
 
 		// Notification
 		ProvideNotificationSmtpService,

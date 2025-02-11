@@ -18,12 +18,8 @@ import (
 	"github.com/devpablocristo/monorepo/pkg/rest/clients/resty"
 	"github.com/devpablocristo/monorepo/pkg/rest/middlewares/gin"
 	"github.com/devpablocristo/monorepo/pkg/rest/servers/gin"
-	"github.com/devpablocristo/monorepo/projects/qh/internal/assessment"
 	"github.com/devpablocristo/monorepo/projects/qh/internal/authe"
-	"github.com/devpablocristo/monorepo/projects/qh/internal/candidate"
 	"github.com/devpablocristo/monorepo/projects/qh/internal/config"
-	"github.com/devpablocristo/monorepo/projects/qh/internal/event"
-	"github.com/devpablocristo/monorepo/projects/qh/internal/group"
 	"github.com/devpablocristo/monorepo/projects/qh/internal/notification"
 	"github.com/devpablocristo/monorepo/projects/qh/internal/person"
 	"github.com/devpablocristo/monorepo/projects/qh/internal/tweet"
@@ -92,38 +88,12 @@ func Initialize() (*Dependencies, error) {
 	}
 	useCases := ProvidePersonUseCases(personRepository)
 	handler := ProvidePersonHandler(server, useCases, middlewares)
-	groupRepository, err := ProvideGroupRepository(repository)
-	if err != nil {
-		return nil, err
-	}
-	groupUseCases := ProvideGroupUseCases(groupRepository)
-	groupHandler := ProvideGroupHandler(server, groupUseCases, middlewares)
-	eventRepository, err := ProvideEventRepository(pkgmongoRepository)
-	if err != nil {
-		return nil, err
-	}
-	eventUseCases := ProvideEventUseCases(eventRepository)
-	eventHandler := ProvideEventHandler(server, eventUseCases, middlewares)
 	userRepository, err := ProvideUserRepository(repository)
 	if err != nil {
 		return nil, err
 	}
 	userUseCases := ProvideUserUseCases(userRepository)
 	userHandler := ProvideUserHandler(server, userUseCases, middlewares)
-	assessmentRepository, err := ProvideAssessmentRepository(repository)
-	if err != nil {
-		return nil, err
-	}
-	smtpService, err := ProvideNotificationSmtpService(pkgsmtpService)
-	if err != nil {
-		return nil, err
-	}
-	notificationUseCases := ProvideNotificationUseCases(smtpService)
-	candidateRepository, err := ProvideCandidateRepository(repository)
-	if err != nil {
-		return nil, err
-	}
-	candidateUseCases := ProvideCandidateUseCases(candidateRepository)
 	autheCache, err := ProvideAutheCache(cache)
 	if err != nil {
 		return nil, err
@@ -137,10 +107,12 @@ func Initialize() (*Dependencies, error) {
 		return nil, err
 	}
 	autheUseCases := ProvideAutheUseCases(autheCache, jwtService, httpClient)
-	assessmentUseCases := ProvideAssessmentUseCases(assessmentRepository, notificationUseCases, candidateUseCases, loader, autheUseCases, useCases)
-	assessmentHandler := ProvideAssessmentHandler(server, assessmentUseCases, middlewares)
-	candidateHandler := ProvideCandidateHandler(server, candidateUseCases, middlewares)
 	autheHandler := ProvideAutheHandler(server, autheUseCases, middlewares)
+	smtpService, err := ProvideNotificationSmtpService(pkgsmtpService)
+	if err != nil {
+		return nil, err
+	}
+	notificationUseCases := ProvideNotificationUseCases(smtpService)
 	notificationHandler := ProvideNotificationHandler(server, notificationUseCases, middlewares)
 	tweetRepository, err := ProvideTweetRepository(pkgcassandraRepository)
 	if err != nil {
@@ -170,11 +142,7 @@ func Initialize() (*Dependencies, error) {
 		CassandraRepository: pkgcassandraRepository,
 		Middlewares:         middlewares,
 		PersonHandler:       handler,
-		GroupHandler:        groupHandler,
-		EventHandler:        eventHandler,
 		UserHandler:         userHandler,
-		AssessmentHandler:   assessmentHandler,
-		CandidateHandler:    candidateHandler,
 		AutheHandler:        autheHandler,
 		NotificationHandler: notificationHandler,
 		TweetHandler:        tweetHandler,
@@ -205,11 +173,7 @@ type Dependencies struct {
 	Middlewares *pkgmwr.Middlewares
 
 	PersonHandler       *person.Handler
-	GroupHandler        *group.Handler
-	EventHandler        *event.Handler
 	UserHandler         *user.Handler
-	AssessmentHandler   *assessment.Handler
-	CandidateHandler    *candidate.Handler
 	AutheHandler        *authe.Handler
 	NotificationHandler *notification.Handler
 	TweetHandler        *tweet.Handler

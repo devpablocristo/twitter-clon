@@ -10,9 +10,6 @@ import (
 	cass "github.com/devpablocristo/monorepo/pkg/databases/nosql/cassandra/gocql"
 	gorm "github.com/devpablocristo/monorepo/pkg/databases/sql/gorm"
 
-	assessmentmodels "github.com/devpablocristo/monorepo/projects/qh/internal/assessment/repository/models"
-	candidatemodels "github.com/devpablocristo/monorepo/projects/qh/internal/candidate/repository/models"
-	groupmodels "github.com/devpablocristo/monorepo/projects/qh/internal/group/repository/models"
 	personmodels "github.com/devpablocristo/monorepo/projects/qh/internal/person/repository/models"
 	usermodels "github.com/devpablocristo/monorepo/projects/qh/internal/user/repository/models"
 
@@ -51,11 +48,7 @@ func RunWebServer(ctx context.Context, deps *wire.Dependencies) error {
 }
 
 func registerRoutes(deps *wire.Dependencies) {
-	deps.EventHandler.Routes()
-	deps.GroupHandler.Routes()
 	deps.PersonHandler.Routes()
-	deps.AssessmentHandler.Routes()
-	deps.CandidateHandler.Routes()
 	deps.UserHandler.Routes()
 	deps.AutheHandler.Routes()
 	deps.NotificationHandler.Routes()
@@ -76,15 +69,7 @@ func RunGormMigrations(ctx context.Context, repo gorm.Repository) error {
 
 	// Lista de modelos a migrar
 	modelsToMigrate := []any{
-		&groupmodels.Group{},
-		&groupmodels.GroupMember{},
-		&assessmentmodels.Assessment{},
-		&assessmentmodels.Problem{},
-		&assessmentmodels.SkillConfig{},
-		&assessmentmodels.UnitTest{},
-		&candidatemodels.Candidate{},
 		&personmodels.Person{},
-		&assessmentmodels.Link{},
 		&usermodels.User{},
 		&usermodels.Follow{},
 	}
