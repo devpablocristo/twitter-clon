@@ -15,17 +15,12 @@ Este proyecto fue desarrollado como parte del proceso de selección para Ualá.
    cd twitter-clon/projects/qh
    ```
 
-2. **Levanta las dependencias (Cassandra, PostgreSQL, Redis, RabbitMQ, etc.) con Docker Compose:**
-   ```bash
-   docker-compose up -d
-   ```
-
-3. **Construye la aplicación para el entorno de desarrollo:**
+2. **Construye la aplicación para el entorno de desarrollo (recomendado para debug):**  
    ```bash
    make qh-dev-build
    ```
 
-4. **Depuración en Visual Studio Code:**
+3. **Depuración en Visual Studio Code:**
    - Abre el proyecto en VS Code.
    - Adjunta el contenedor (Attach Visual Studio Code).
    - Ejecuta el debugger (`F5`).
@@ -34,13 +29,25 @@ Este proyecto fue desarrollado como parte del proceso de selección para Ualá.
 
 1. **Asegúrate de que los servicios de Docker Compose estén en ejecución.**
 
-2. **Construye la aplicación para el entorno de prueba:**
+2. **Construye la aplicación para el entorno de prueba (recomendado para pruebas):**
    ```bash
    make qh-stg-build
    ```
 
 📍 **Por defecto, la aplicación se ejecuta en el puerto 8080.**  
 📍 **Se incluye el archivo `.env` para simplificar la configuración de variables de entorno.**
+
+---
+
+### 🔹 Docker Compose
+
+Si prefieres usar Docker Compose para levantar los servicios, ejecuta:
+
+   ```bash
+   docker-compose up -d
+   ```
+
+🔹 **Nota:** Aunque se puede utilizar Docker Compose, se recomienda usar `make` para una mejor gestión de la aplicación.
 
 ---
 
@@ -54,11 +61,11 @@ Proyecto
 │   └── api
 │       └── main.go         # Punto de entrada de la aplicación
 ├── internal
-│   ├── auth               # Lógica de Autenticación
+│   ├── auth               # Lógica de autenticación
 │   ├── config             # Configuración general
-│   ├── person             # Lógica de Personas (PostgreSQL)
-│   ├── tweet              # Lógica de Tweets (Cassandra, Redis, RabbitMQ)
-│   └── user               # Lógica de Usuarios (GORM)
+│   ├── person             # Lógica de personas (PostgreSQL)
+│   ├── tweet              # Lógica de tweets (Cassandra, Redis, RabbitMQ)
+│   └── user               # Lógica de usuarios (GORM)
 ├── integration-tests       # Tests de integración para tweets
 ├── mocks                   # Mocks generados con GoMock
 └── wire                    # Inyección de dependencias con Wire
@@ -75,7 +82,7 @@ No se implementa un sistema de *sign in* o manejo de sesiones. Se asume que todo
 La solución está diseñada para soportar millones de usuarios utilizando bases de datos distribuidas (*Cassandra*), caché distribuido (*Redis*) y mensajería asíncrona (*RabbitMQ*).
 
 ✅ **Optimización para Lecturas:**  
-Se prioriza la eficiencia en consultas utilizando estrategias de cache y estructuras de datos denormalizadas para el timeline.
+Se prioriza la eficiencia en consultas utilizando estrategias de cache y estructuras de datos desnormalizadas para el timeline.
 
 ✅ **Testing:**  
 Se incluyen pruebas unitarias y de integración para validar los casos de uso principales.
@@ -157,11 +164,3 @@ curl --location 'localhost:8080/api/v1/tweets/public' \
 ```bash
 curl --location 'localhost:8080/api/v1/tweets/public/fb312abc-d3ee-4450-8c3c-ac4ff1f3ed86/timeline'
 ```
-
----
-
-## 📌 Notas Adicionales
-
-- 🐳 **Docker Compose:** El archivo `docker-compose.yml` define la configuración de Cassandra, PostgreSQL, Redis y RabbitMQ.
-- 🔗 **Wire:** Se utiliza para la inyección de dependencias, facilitando la escalabilidad y el mantenimiento del código.
-- ⚙️ **Makefile:** Se incluyen *targets* en el `Makefile` para simplificar la construcción y ejecución de la aplicación en distintos entornos.
