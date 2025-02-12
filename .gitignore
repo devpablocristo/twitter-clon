@@ -60,7 +60,7 @@ out/
 # IDE/Editor Directories
 # Specific settings for various editors/IDEs should not be tracked by Git.
 .idea/
-.vscode/
+# .vscode/
 *.sublime-workspace
 *.sublime-project
 *.sln
