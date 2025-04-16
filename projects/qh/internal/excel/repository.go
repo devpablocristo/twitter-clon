@@ -18,7 +18,7 @@ func NewMongoRepository(db *mongo.Database) *MongoRepository {
 	}
 }
 
-func (r *MongoRepository) CreatePerson(ctx context.Context, person domain.Person_2) error {
+func (r *MongoRepository) SavePerson(ctx context.Context, person domain.Person_2) error {
 	_, err := r.collection.InsertOne(ctx, bson.M{
 		"first_name": person.FirstName,
 		"last_name":  person.LastName,

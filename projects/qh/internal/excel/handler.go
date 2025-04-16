@@ -2,25 +2,29 @@ package excel
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 
 	mdw "github.com/devpablocristo/monorepo/pkg/rest/middlewares/gin"
 	gsv "github.com/devpablocristo/monorepo/pkg/rest/servers/gin"
 	types "github.com/devpablocristo/monorepo/pkg/types"
+	"github.com/devpablocristo/monorepo/projects/qh/internal/excel/adapter"
 	"github.com/gin-gonic/gin"
 )
 
 type Handler struct {
-	ucs useCases
+	ucs UseCases
 	gsv gsv.Server
 	mws *mdw.Middlewares
+	ea  adapter.ExcelAdapter
 }
 
-func NewHandler(s gsv.Server, u useCases, m *mdw.Middlewares) *Handler {
+func NewHandler(s gsv.Server, u UseCases, m *mdw.Middlewares, e adapter.ExcelAdapter) *Handler {
 	return &Handler{
 		ucs: u,
 		gsv: s,
 		mws: m,
+		ea:  e,
 	}
 }
 
@@ -66,13 +70,26 @@ func (h *Handler) UploadExcel(c *gin.Context) {
 	}
 	defer file.Close()
 
-	if err := h.ucs.ProccesExcel(c.Request.Context(), file); err != nil {
-		apiErr, code := types.NewAPIError(err)
-		c.Error(apiErr).SetMeta(code)
+	// llamo al adaptador excel
+	persons, err := h.ea.ParseExcel(file)
+	if err != nil {
+		log.Fatalf("error parsing excel: %v", err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": "internal error"})
 		return
 	}
 
-	c.JSON(http.StatusCreated, types.MessageResponse{
-		Message: "Archivo procesado correctamente",
-	})
+	// llamo al caso de uso
+	if len(persons) > 0 {
+		if errList, err := h.ucs.Procces(c.Request.Context(), persons); err != nil {
+			log.Printf("Error processing data: %v", errList)
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"error":   "error processing data",
+				"details": errList,
+			})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{"message": "file processed successfully"})
+	}
+
 }

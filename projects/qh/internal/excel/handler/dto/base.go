@@ -1,7 +1,5 @@
 package dto
 
-import "github.com/devpablocristo/monorepo/projects/qh/internal/excel/usecases/domain"
-
 type ExcelPerson struct {
 	FirstName string `json:"first_name"`
 	LastName  string `json:"last_name"`
@@ -9,11 +7,11 @@ type ExcelPerson struct {
 	Phone     string `json:"phone"`
 }
 
-func (E *ExcelPerson) ToDomain() domain.Person_2 {
+/*func (E *ExcelPerson) ToDomain() domain.Person_2 {
 	return domain.Person_2{
 		FirstName: E.FirstName,
 		LastName:  E.LastName,
 		Age:       E.Age,
 		Phone:     E.Phone,
 	}
-}
+}*/

@@ -2,15 +2,15 @@ package excel
 
 import (
 	"context"
-	"mime/multipart"
 
+	"github.com/devpablocristo/monorepo/projects/qh/internal/excel/handler/dto"
 	"github.com/devpablocristo/monorepo/projects/qh/internal/excel/usecases/domain"
 )
 
 type Person_2Repository interface {
-	CreatePerson(context.Context, domain.Person_2) error
+	SavePerson(context.Context, domain.Person_2) ([]string, error)
 }
 
 type UseCases interface {
-	ProccesExcel(context.Context, multipart.File) error
+	Procces(context.Context, []dto.ExcelPerson) ([]string, error)
 }
