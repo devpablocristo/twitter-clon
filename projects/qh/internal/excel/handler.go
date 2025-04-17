@@ -65,7 +65,7 @@ func (h *Handler) ProtectedPing(c *gin.Context) {
 func (h *Handler) UploadPersonExcel(c *gin.Context) {
 	file, _, err := c.Request.FormFile("file")
 	if err != nil {
-		apiErr, code := types.NewAPIError(fmt.Errorf("no se pudo obtener el archivo %w", err))
+		apiErr, code := types.NewAPIError(fmt.Errorf("the file could not be obtained %w", err))
 		c.Error(apiErr).SetMeta(code)
 		return
 	}
@@ -92,13 +92,12 @@ func (h *Handler) UploadPersonExcel(c *gin.Context) {
 
 		c.JSON(http.StatusOK, gin.H{"message": "file processed successfully"})
 	}
-
 }
 
 func (h *Handler) UploadOrderExcel(c *gin.Context) {
 	file, _, err := c.Request.FormFile("file")
 	if err != nil {
-		apiErr, code := types.NewAPIError(fmt.Errorf("no se pudo obtener el archivo %w", err))
+		apiErr, code := types.NewAPIError(fmt.Errorf("the file could not be obtained %w", err))
 		c.Error(apiErr).SetMeta(code)
 		return
 	}
@@ -123,5 +122,4 @@ func (h *Handler) UploadOrderExcel(c *gin.Context) {
 
 		c.JSON(http.StatusOK, gin.H{"message": "file processed successfully"})
 	}
-
 }
