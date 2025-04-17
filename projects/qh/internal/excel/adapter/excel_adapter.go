@@ -16,7 +16,7 @@ func NewExcelAdapter() ExcelAdapter {
 	return ExcelAdapter{}
 }
 
-func (a *ExcelAdapter) ParseExcel(r io.Reader) ([]dto.ExcelPerson, error) {
+func (a *ExcelAdapter) ParsePersonExcel(r io.Reader) ([]dto.ExcelPerson, error) {
 	f, err := excelize.OpenReader(r)
 	if err != nil {
 		return nil, fmt.Errorf("error opening excel %w", err)
@@ -64,4 +64,55 @@ func (a *ExcelAdapter) ParseExcel(r io.Reader) ([]dto.ExcelPerson, error) {
 		return persons, fmt.Errorf("error in the file:\n%s", strings.Join(errs, "\n"))
 	}
 	return persons, nil
+}
+
+func (a *ExcelAdapter) ParseOrderExcel(r io.Reader) ([]dto.OrderDto, error) {
+	f, err := excelize.OpenReader(r)
+	if err != nil {
+		return nil, fmt.Errorf("error opening excel: %w", err)
+	}
+	defer f.Close()
+
+	sheet := f.GetSheetName(0)
+	rows, err := f.GetRows(sheet)
+	if err != nil {
+		return nil, fmt.Errorf("error reading rows: %w", err)
+	}
+
+	var (
+		orders []dto.OrderDto
+		errs   []string
+	)
+
+	for i, row := range rows {
+		if i == 0 {
+			continue
+		}
+
+		if len(row) < 5 {
+			errs = append(errs, fmt.Sprintf("incomplete row %d", i+1))
+		}
+
+		total, err := strconv.ParseFloat(row[2], 64)
+		if err != nil {
+			errs = append(errs, fmt.Sprintf("invalid amount in row %d: %v", i+1, err))
+			continue
+		}
+
+		order := dto.OrderDto{
+			OrderID:     row[0],
+			Customer:    row[1],
+			TotalAmount: total,
+			Status:      row[3],
+			Date:        row[4],
+		}
+
+		orders = append(orders, order)
+	}
+
+	if len(errs) < 0 {
+		return orders, fmt.Errorf("errors in the file: \n%s", strings.Join(errs, "\n"))
+	}
+
+	return orders, nil
 }

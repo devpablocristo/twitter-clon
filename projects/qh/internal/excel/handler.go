@@ -32,7 +32,7 @@ func (h *Handler) Routes() {
 	router := h.gsv.GetRouter()
 
 	apiVersion := h.gsv.GetApiVersion()
-	apiBase := "/api" + apiVersion + "/persons"
+	apiBase := "/api" + apiVersion + "/upload"
 
 	publicPrefix := apiBase + "public"
 	validatePrefix := apiBase + "validated"
@@ -40,7 +40,8 @@ func (h *Handler) Routes() {
 
 	public := router.Group(publicPrefix)
 	{
-		public.POST("/upload-excel", h.UploadExcel)
+		public.POST("/person", h.UploadPersonExcel)
+		public.POST("/order", h.UploadOrderExcel)
 	}
 
 	validated := router.Group(validatePrefix)
@@ -61,7 +62,7 @@ func (h *Handler) ProtectedPing(c *gin.Context) {
 	})
 }
 
-func (h *Handler) UploadExcel(c *gin.Context) {
+func (h *Handler) UploadPersonExcel(c *gin.Context) {
 	file, _, err := c.Request.FormFile("file")
 	if err != nil {
 		apiErr, code := types.NewAPIError(fmt.Errorf("no se pudo obtener el archivo %w", err))
@@ -71,7 +72,7 @@ func (h *Handler) UploadExcel(c *gin.Context) {
 	defer file.Close()
 
 	// llamo al adaptador excel
-	persons, err := h.ea.ParseExcel(file)
+	persons, err := h.ea.ParsePersonExcel(file)
 	if err != nil {
 		log.Fatalf("error parsing excel: %v", err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": "internal error"})
@@ -80,7 +81,38 @@ func (h *Handler) UploadExcel(c *gin.Context) {
 
 	// llamo al caso de uso
 	if len(persons) > 0 {
-		if errList, err := h.ucs.Procces(c.Request.Context(), persons); err != nil {
+		if errList, err := h.ucs.ProccesPerson(c.Request.Context(), persons); err != nil {
+			log.Printf("Error processing data: %v", errList)
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"error":   "error processing data",
+				"details": errList,
+			})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{"message": "file processed successfully"})
+	}
+
+}
+
+func (h *Handler) UploadOrderExcel(c *gin.Context) {
+	file, _, err := c.Request.FormFile("file")
+	if err != nil {
+		apiErr, code := types.NewAPIError(fmt.Errorf("no se pudo obtener el archivo %w", err))
+		c.Error(apiErr).SetMeta(code)
+		return
+	}
+	defer file.Close()
+
+	orders, err := h.ea.ParseOrderExcel(file)
+	if err != nil {
+		log.Fatalf("error parsing excel: %v", err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": "internal error"})
+		return
+	}
+
+	if len(orders) > 0 {
+		if errList, err := h.ucs.ProccesOrder(c.Request.Context(), orders); err != nil {
 			log.Printf("Error processing data: %v", errList)
 			c.JSON(http.StatusInternalServerError, gin.H{
 				"error":   "error processing data",

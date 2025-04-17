@@ -12,8 +12,12 @@ func ProvideMongoRepository(db *mongo.Database) *excel.MongoRepository {
 	return excel.NewMongoRepository(db)
 }
 
-func ProvidePerson_2Usecase(r excel.Person_2Repository) excel.UseCases {
-	return excel.NewUseCases(r)
+func ProvideOrderRepository(db *mongo.Database) excel.OrderRepository {
+	return excel.NewOrderRepository(db)
+}
+
+func ProvideUsecase(r excel.Person_2Repository, or excel.OrderRepository) excel.UseCases {
+	return excel.NewUseCases(r, or)
 }
 
 func ProvideExcelHandler(server ginsrv.Server, usecases excel.UseCases, middleware *mdw.Middlewares, excelAdapter adapter.ExcelAdapter) *excel.Handler {
