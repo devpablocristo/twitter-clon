@@ -1,69 +1,77 @@
 package domain
 
+type FullProject struct {
+	Client   Client
+	Project  Project
+	Manager  Manager
+	Investor Investor
+	Field    Field
+	Plot     Plot
+}
+
 type Client struct {
-	ID      int
-	Name    string
-	Project []Project
+	ID   uint
+	Name string
 }
 
 type User struct {
-	ID    int
+	ID    uint
 	Name  string
 	Email string
 }
 
 type Manager struct {
-	ID     int
-	UserID int
+	ID     uint
+	UserID uint
 	Title  string
 	User   User
 }
 
 type Investor struct {
-	ID      int
-	UserID  int
-	Company string
-	User    User
+	ID         uint
+	UserID     uint
+	Company    string
+	User       User
+	Percentage float64 // este campo no está en DB, pero lo usamos para el ProjectInvestor
+}
+
+type Project struct {
+	ID       uint
+	Name     string
+	ClientID uint
+	Client   Client
+	Fields   Field
+}
+
+type ProjectManagers struct {
+	ProjectID uint
+	ManagerID uint
+	Project   Project
+	Manager   Manager
 }
 
 type ProjectInvestor struct {
-	ProjectID  int
-	InvestorID int
+	ProjectID  uint
+	InvestorID uint
 	Percentage float64
 	Project    Project
 	Investor   Investor
 }
 
-type ProjectManagers struct {
-	ProjectID int
-	ManagerID int
-	Project   Project
-	Manager   Manager
-}
-
-type Project struct {
-	ID       int
-	Name     string
-	ClientID int
-	Client   Client
-	Fields   []Field
-}
-
 type Field struct {
-	ID        int
+	ID        uint
 	Name      string
 	LeaseType string
-	ProjectID int
+	ProjectID uint
 	Plots     []Plot
 }
 
 type Plot struct {
-	ID          int
+	ID          uint
 	Name        string
 	Hectares    float64
 	PreviusCrop string
 	CurrentCrop string
 	Season      string
-	FieldID     int
-	Field       Field
+	FieldID     uint
 }
