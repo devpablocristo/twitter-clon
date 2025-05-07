@@ -29,11 +29,10 @@ func NewHandler(s gsv.Server, u useCases, m *mdw.Middlewares, e adapter.ExcelAda
 func (h *Handler) Routes() {
 	router := h.gsv.GetRouter()
 	apiVersion := h.gsv.GetApiVersion()
-	apiBase := "/api" + apiVersion + "/upload"
+	apiBase := "/api/" + apiVersion + "/upload"
 
 	fullProject := router.Group(apiBase + "/fullProject")
 	{
-
 		fullProject.POST("", h.UploadFullProjectExcel)
 	}
 }

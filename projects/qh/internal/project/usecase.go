@@ -11,8 +11,8 @@ type useCases struct {
 	repo FullProjectsRepo
 }
 
-func NewUseCases(repo FullProjectsRepo) *useCases {
-	return &useCases{
+func NewUseCases(repo FullProjectsRepo) useCases {
+	return useCases{
 		repo: repo,
 	}
 }
