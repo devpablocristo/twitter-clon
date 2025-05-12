@@ -30,14 +30,14 @@ func (r *repository) SaveFullProject(ctx context.Context, fps []domain.FullProje
 			return nil, err
 		}
 
-		// creando ManagerUser
+		// crear ManagerUser
 		if err := tx.Create(&models.ManagerUser).Error; err != nil {
 			tx.Rollback()
 			return nil, err
 		}
 
-		// creando manager (usando el ID de ManagerUser)
-		models.Manager.ID = models.ManagerUser.ID
+		// crear Manager con su UserID correcto
+		models.Manager.UserID = models.ManagerUser.ID
 		if err := tx.Create(&models.Manager).Error; err != nil {
 			tx.Rollback()
 			return nil, err
